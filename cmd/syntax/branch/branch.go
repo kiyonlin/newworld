@@ -49,11 +49,11 @@ func grade(score int) string {
 }
 
 func f1(ch chan int) {
-	time.Sleep(time.Second * 5)
+	time.Sleep(time.Second * 1)
 	ch <- 1
 }
 
 func f2(ch chan int) {
-	time.Sleep(time.Second * 10)
+	time.Sleep(time.Second * 2)
 	ch <- 1
 }
