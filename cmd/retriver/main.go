@@ -10,6 +10,7 @@ import (
 
 const url = "http://www.imooc.com"
 
+// Retriever can get info from url
 type Retriever interface {
 	Get(url string) string
 }
