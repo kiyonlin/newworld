@@ -5,7 +5,7 @@ import (
 )
 
 // Queue use []int to implement
-type Queue []int
+type Queue []interface{}
 
 // Push an item to the given q
 func (q *Queue) Push(v int) {
@@ -18,7 +18,7 @@ func (q *Queue) Push(v int) {
 func (q *Queue) Pop() int {
 	head := (*q)[0]
 	*q = (*q)[1:]
-	return head
+	return head.(int)
 }
 
 // IsEmpty judge if the given q is empty
