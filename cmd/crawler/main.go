@@ -29,9 +29,9 @@ const regexpstr1 = `<a href="(http://www.zhenai.com/zhenghun/[0-9a-z]+)"[^>]*>([
 
 func printCityList(contents []byte) {
 	re := regexp.MustCompile(regexpstr1)
-	amtch := re.FindAllSubmatch(contents, -1)
+	match := re.FindAllSubmatch(contents, -1)
 
-	for _, m := range amtch {
+	for _, m := range match {
 		fmt.Printf("%s\n %s \n", m[1], m[2])
 	}
 }

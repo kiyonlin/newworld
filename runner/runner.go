@@ -29,7 +29,7 @@ type Runner struct {
 // ErrTimeout is returned when a value is received on the timeout channel.
 var ErrTimeout = errors.New("received timeout")
 
-// ErrInterrupt is returned when an event from the OS is received.
+// ErrInterupt is returned when an event from the OS is received.
 var ErrInterupt = errors.New("received interrupt")
 
 // New returns a new ready-to-use Runner.
