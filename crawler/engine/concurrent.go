@@ -1,11 +1,10 @@
 package engine
 
-import "log"
-
 // ConcurrentEngine has scheduler and worker count
 type ConcurrentEngine struct {
 	Scheduler   Scheduler
 	WorkerCount int
+	ItemChan    chan interface{}
 }
 
 // Scheduler can sumbit and configure master worker channel
@@ -30,17 +29,23 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 	}
 
 	for _, r := range seeds {
+		if isDuplicate(r.URL) {
+			continue
+		}
 		e.Scheduler.Submit(r)
 	}
 
-	itemCount := 0
 	for {
 		result := <-out
 		for _, item := range result.Items {
-			itemCount++
-			log.Printf("Got item #%d: %v", itemCount, item)
+			go func(item interface{}) {
+				e.ItemChan <- item
+			}(item)
 		}
 		for _, request := range result.Requests {
+			if isDuplicate(request.URL) {
+				continue
+			}
 			e.Scheduler.Submit(request)
 		}
 	}
@@ -58,4 +63,14 @@ func createWorker(in chan Request, out chan ParseResult, ready ReadyNotifier) {
 			out <- result
 		}
 	}()
+}
+
+var visitedURLs = make(map[string]bool)
+
+func isDuplicate(url string) bool {
+	if visitedURLs[url] {
+		return true
+	}
+	visitedURLs[url] = true
+	return false
 }

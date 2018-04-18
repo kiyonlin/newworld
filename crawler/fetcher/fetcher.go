@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"time"
 
@@ -39,7 +38,7 @@ func Fetch(url string) ([]byte, error) {
 func determineEncoder(r *bufio.Reader) encoding.Encoding {
 	bytes, err := r.Peek(1024)
 	if err != nil {
-		log.Printf("Fetcher error :%v", err)
+		// log.Printf("Fetcher error :%v", err)
 		return unicode.UTF8
 	}
 	e, _, _ := charset.DetermineEncoding(bytes, "")
