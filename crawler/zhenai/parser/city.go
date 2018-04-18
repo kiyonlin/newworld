@@ -6,16 +6,18 @@ import (
 	"github.com/kiyonlin/newworld/crawler/engine"
 )
 
-const cityReg = `<a href="(http://album.zhenai.com/u/[0-9]+)"[^>]*>([^<]+)</a>`
+var (
+	cityReg    = regexp.MustCompile(`<a href="(http://album.zhenai.com/u/[0-9]+)"[^>]*>([^<]+)</a>`)
+	cityUrlReg = regexp.MustCompile(`href="(http://www.zhenai.com/zhenghun/shanghai/[^"]+)">`)
+)
 
 // ParseCity parse the city into parse result
 func ParseCity(contents []byte) engine.ParseResult {
-	re := regexp.MustCompile(cityReg)
-	match := re.FindAllSubmatch(contents, -1)
+	match := cityReg.FindAllSubmatch(contents, -1)
 	result := engine.ParseResult{}
 	for _, m := range match {
 		userName := string(m[2])
-		result.Items = append(result.Items, "User: "+userName)
+		// result.Items = append(result.Items, "User: "+userName)
 		result.Requests = append(result.Requests, engine.Request{
 			URL: string(m[1]),
 			ParserFunc: func(c []byte) engine.ParseResult {
@@ -23,5 +25,15 @@ func ParseCity(contents []byte) engine.ParseResult {
 			},
 		})
 	}
+
+	matches := cityUrlReg.FindAllSubmatch(contents, -1)
+
+	for _, m := range matches {
+		result.Requests = append(result.Requests, engine.Request{
+			URL:        string(m[1]),
+			ParserFunc: ParseCity,
+		})
+	}
+
 	return result
 }
