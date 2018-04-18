@@ -10,17 +10,23 @@ type ConcurrentEngine struct {
 
 // Scheduler can sumbit and configure master worker channel
 type Scheduler interface {
+	ReadyNotifier
 	Submit(Request)
-	ConfigureMasterWorkerChan(chan Request)
+	WorkerChan() chan Request
+	Run()
+}
+
+// ReadyNotifier knows if worker is ready
+type ReadyNotifier interface {
+	WorkerReady(chan Request)
 }
 
 // Run all request seeds
 func (e *ConcurrentEngine) Run(seeds ...Request) {
-	in := make(chan Request)
 	out := make(chan ParseResult)
-	e.Scheduler.ConfigureMasterWorkerChan(in)
+	e.Scheduler.Run()
 	for i := 0; i < e.WorkerCount; i++ {
-		createWorker(in, out)
+		createWorker(e.Scheduler.WorkerChan(), out, e.Scheduler)
 	}
 
 	for _, r := range seeds {
@@ -40,9 +46,10 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 	}
 }
 
-func createWorker(in chan Request, out chan ParseResult) {
+func createWorker(in chan Request, out chan ParseResult, ready ReadyNotifier) {
 	go func() {
 		for {
+			ready.WorkerReady(in)
 			request := <-in
 			result, err := worker(request)
 			if err != nil {
