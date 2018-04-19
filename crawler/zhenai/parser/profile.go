@@ -24,8 +24,10 @@ var constellationRe = regexp.MustCompile(`<td><span class="label">星座：</spa
 
 var guessRe = regexp.MustCompile(`<a class="exp-user-name"[^>]*href="(http://album.zhenai.com/u/[\d]+)">([^<]+)</a>`)
 
+var idURLRe = regexp.MustCompile(`http://album.zhenai.com/u/([\d]+)`)
+
 // ParseProfile parse profile info from the contests
-func ParseProfile(contents []byte, name string) engine.ParseResult {
+func ParseProfile(contents []byte, name string, url string) engine.ParseResult {
 	profile := model.Profile{}
 	profile.Name = name
 	profile.Age = extractInt(contents, ageRe)
@@ -38,18 +40,27 @@ func ParseProfile(contents []byte, name string) engine.ParseResult {
 	profile.House = extractString(contents, houseRe)
 	profile.Car = extractString(contents, carRe)
 	profile.Constellation = extractString(contents, constellationRe)
+	id := extractString([]byte(url), idURLRe)
 
 	result := engine.ParseResult{
-		Items: []interface{}{profile},
+		Items: []engine.Item{
+			{
+				URL:     url,
+				Type:    "zhenai",
+				ID:      id,
+				Payload: profile,
+			},
+		},
 	}
 
 	matches := guessRe.FindAllSubmatch(contents, -1)
 	for _, m := range matches {
+		url := string(m[1])
 		username := string(m[2])
 		result.Requests = append(result.Requests, engine.Request{
-			URL: string(m[1]),
+			URL: url,
 			ParserFunc: func(c []byte) engine.ParseResult {
-				return ParseProfile(c, username)
+				return ParseProfile(c, username, url)
 			},
 		})
 	}

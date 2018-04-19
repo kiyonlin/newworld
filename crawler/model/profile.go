@@ -1,5 +1,7 @@
 package model
 
+import "encoding/json"
+
 // Profile define a user profile
 type Profile struct {
 	Name          string
@@ -15,4 +17,15 @@ type Profile struct {
 	Constellation string // 星座
 	House         string
 	Car           string
+}
+
+// FromJSONObj set profile from json object
+func FromJSONObj(o interface{}) (Profile, error) {
+	var profile Profile
+	s, err := json.Marshal(o)
+	if err != nil {
+		return profile, err
+	}
+	err = json.Unmarshal(s, &profile)
+	return profile, err
 }

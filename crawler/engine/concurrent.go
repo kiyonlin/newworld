@@ -4,7 +4,7 @@ package engine
 type ConcurrentEngine struct {
 	Scheduler   Scheduler
 	WorkerCount int
-	ItemChan    chan interface{}
+	ItemChan    chan Item
 }
 
 // Scheduler can sumbit and configure master worker channel
@@ -38,7 +38,7 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 	for {
 		result := <-out
 		for _, item := range result.Items {
-			go func(item interface{}) {
+			go func(item Item) {
 				e.ItemChan <- item
 			}(item)
 		}
