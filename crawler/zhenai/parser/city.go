@@ -12,7 +12,7 @@ var (
 )
 
 // ParseCity parse the city into parse result
-func ParseCity(contents []byte) engine.ParseResult {
+func ParseCity(contents []byte, _ string) engine.ParseResult {
 	match := cityReg.FindAllSubmatch(contents, -1)
 	result := engine.ParseResult{}
 	for _, m := range match {
@@ -20,10 +20,8 @@ func ParseCity(contents []byte) engine.ParseResult {
 		userName := string(m[2])
 		// result.Items = append(result.Items, "User: "+userName)
 		result.Requests = append(result.Requests, engine.Request{
-			URL: url,
-			ParserFunc: func(c []byte) engine.ParseResult {
-				return ParseProfile(c, userName, url)
-			},
+			URL:        url,
+			ParserFunc: ProfileParser(userName),
 		})
 	}
 
