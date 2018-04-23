@@ -4,7 +4,7 @@ import (
 	"html/template"
 	"io"
 
-	"github.com/kiyonlin/newworld/crawler/frontend/model"
+	"github.com/kiyonlin/newworld/cmd/crawler-frontend/model"
 )
 
 // SearchResultView is the view

@@ -41,7 +41,7 @@ func TestSaver(t *testing.T) {
 		panic(err)
 	}
 
-	err = save(client, expected)
+	err = save(client, "dating_profile", expected)
 	if err != nil {
 		panic(err)
 	}

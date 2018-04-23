@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/kiyonlin/newworld/cmd/crawler-frontend/model"
 	"github.com/kiyonlin/newworld/crawler/engine"
-	"github.com/kiyonlin/newworld/crawler/frontend/model"
 	common "github.com/kiyonlin/newworld/crawler/model"
 )
 
