@@ -379,21 +379,25 @@ func banIps(ips []string) {
     r, w := io.Pipe()
 
     ipset.Stdin = r
-    ipset.Start()
+    if err := ipset.Start(); err != nil {
+        log.Println(err)
+    } else {
+        for _, ip := range (ips) {
+            fmt.Fprintf(w, "add %s %s timeout %d\n", ipsetName, ip, ipsetTimeout)
+        }
 
-    for _, ip := range (ips) {
-        fmt.Fprintf(w, "add %s %s timeout %d\n", ipsetName, ip, ipsetTimeout)
+        w.Close()
+
+        ipset.Wait()
+
+        f, err := os.OpenFile(logFileName, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666)
+        defer f.Close()
+        if err == nil && len(ips) > 0 {
+            fmt.Fprintf(f, "%s: 封禁%d个ip\n", time.Now().Format("2006-01-02 15:04:05"), len(ips))
+        }
     }
 
     w.Close()
-
-    ipset.Wait()
-
-    f, err := os.OpenFile(logFileName, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666)
-    defer f.Close()
-    if err == nil && len(ips) > 0 {
-        fmt.Fprintf(f, "%s: 封禁%d个ip\n", time.Now().Format("2006-01-02 15:04:05"), len(ips))
-    }
 
     wg.Done()
 }
