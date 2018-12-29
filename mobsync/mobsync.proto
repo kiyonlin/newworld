@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package mobsync;
+
+service Mobsync {
+    rpc SyncStream(stream Message) returns (stream Message) {}
+}
+
+message Message {
+    enum Action {
+        REPLY = 0;
+        CONNECT = 1;
+        REPORT = 2;
+        DISPATCH = 3;
+    }
+    Action action = 1;
+    string session = 2;
+    int32 nodeId = 3;
+    int32 siteId = 4;
+    repeated string ipBlackList = 5;
+    repeated string uuidBlackList = 6;
+    repeated string uuidWhiteList = 7;
+}
